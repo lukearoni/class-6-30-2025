@@ -15,6 +15,7 @@ suppressPackageStartupMessages(library(tidyverse))
 # Set your Census API key (only needs to be done once per machine)
 # census_api_key("YOUR_API_KEY", install = TRUE)
 
+options(tigris_progress = FALSE, tigris_use_cache = TRUE)
 # Get median income data for all Massachusetts counties (or tracts)
 ma_income <- suppressMessages(get_acs(
   geography = "county",     # or use "tract" for more detail
@@ -27,6 +28,116 @@ ma_income <- suppressMessages(get_acs(
 ```
 
 ```{r}
+#| message: false
+#| warning: false
+#| fig.width: 10
+#| fig.height: 10
+
+library(tidycensus)
+library(tidyverse)
+library(sf)
+
+options(tigris_progress = FALSE, tigris_use_cache = TRUE)
+invisible(capture.output(sf::sf_use_s2(FALSE)))
+# Get median income data by town (county subdivision) in MA
+ma_town_income <- suppressMessages(
+  suppressWarnings(get_acs(
+  geography = "county subdivision",
+  variables = "B19013_001",
+  state = "MA",
+  year = 2022,
+  survey = "acs5",
+  geometry = TRUE,
+  output = "wide")
+  )
+)
+
+# Clean column names
+ma_town_income_clean <- ma_town_income %>%
+  rename(
+    median_income = B19013_001E,
+    moe = B19013_001M
+  )
+
+# Plot
+ggplot(ma_town_income_clean) +
+  geom_sf(aes(fill = median_income), color = "white", size = 0.1) +
+  scale_fill_viridis_c(
+    option = "magma",
+    direction = -1,
+    name = "Median Income ($)",
+    labels = scales::label_comma()
+  ) +
+  labs(
+    title = "Median Household Income by Town in Massachusetts (2022)",
+    subtitle = "Source: U.S. Census Bureau, ACS 5-Year Estimates",
+    caption = "Data via tidycensus (county subdivisions)"
+  ) +
+  theme_minimal(base_family = "Times") +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12)
+  )
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| fig.width: 10
+#| fig.height: 8
+
+library(tidycensus)
+library(tidyverse)
+library(tigris)
+library(sf)
+
+options(tigris_progress = FALSE, tigris_use_cache = TRUE)
+invisible(capture.output(sf::sf_use_s2(FALSE)))
+# Get ACS data for median household income
+ma_income <- suppressMessages(
+  suppressWarnings(get_acs(
+  geography = "county",
+  variables = "B19013_001",
+  state = "MA",
+  year = 2022,
+  survey = "acs5",
+  geometry = TRUE,  # Get shapes for mapping
+  output = "wide")
+  )
+)
+
+# Clean column names
+ma_income_clean <- ma_income %>%
+  rename(
+    median_income = B19013_001E,
+    moe = B19013_001M
+  )
+
+# Plot the map
+ggplot(ma_income_clean) +
+  geom_sf(aes(fill = median_income), color = "white") +
+  scale_fill_viridis_c(
+    option = "plasma",
+    name = "Median Income ($)",
+    labels = scales::label_comma()
+  ) +
+  labs(
+    title = "Median Household Income by County in Massachusetts (2022)",
+    subtitle = "Source: U.S. Census Bureau, ACS 5-Year Estimates",
+    caption = "Data via tidycensus"
+  ) +
+  theme_minimal(base_family = "Times") +
+  theme(
+    legend.position = "right",
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12)
+  )
+```
+
+```{r}
+#| fig.width: 10
+#| fig.height: 10
 library(ggplot2)
 library(dplyr)
 
