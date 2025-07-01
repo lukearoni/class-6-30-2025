@@ -1,0 +1,31 @@
+---
+title: "Massachusetts Income"
+execute:
+    echo: false
+    message: false
+---
+
+```{r}
+# Load packages
+#| cache: true
+#| message: false
+library(tidycensus)
+library(tidyverse)
+
+# Set your Census API key (only needs to be done once per machine)
+# census_api_key("YOUR_API_KEY", install = TRUE)
+
+# Get median income data for all Massachusetts counties (or tracts)
+ma_income <- get_acs(
+  geography = "county",     # or use "tract" for more detail
+  variables = "B19013_001", # median household income
+  state = "MA",
+  year = 2022,
+  survey = "acs5",
+  output = "wide"
+)
+
+# View results
+glimpse(ma_income)
+summary(ma_income)
+```
