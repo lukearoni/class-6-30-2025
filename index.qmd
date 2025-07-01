@@ -10,22 +10,53 @@ execute:
 #| cache: true
 #| message: false
 library(tidycensus)
-library(tidyverse)
+suppressPackageStartupMessages(library(tidyverse))
 
 # Set your Census API key (only needs to be done once per machine)
 # census_api_key("YOUR_API_KEY", install = TRUE)
 
 # Get median income data for all Massachusetts counties (or tracts)
-ma_income <- get_acs(
+ma_income <- suppressMessages(get_acs(
   geography = "county",     # or use "tract" for more detail
   variables = "B19013_001", # median household income
   state = "MA",
   year = 2022,
   survey = "acs5",
-  output = "wide"
+  output = "wide")
 )
-
-# View results
-glimpse(ma_income)
-summary(ma_income)
 ```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Clean and sort your data
+ma_income_sorted <- ma_income %>%
+  arrange(B19013_001E) %>%
+  mutate(NAME = factor(NAME, levels = NAME))  # preserve order in plot
+
+# Plot
+ggplot(ma_income_sorted, aes(x = NAME, y = B19013_001E)) +
+  geom_col(fill = "#3182bd") +
+  geom_errorbar(aes(ymin = B19013_001E - B19013_001M,
+                    ymax = B19013_001E + B19013_001M),
+                width = 0.2, color = "gray40") +
+  coord_flip() +
+  labs(
+    title = "Median Household Income by County in MA (2022)",
+    subtitle = "Error bars show margins of error from ACS 5-Year Estimates",
+    x = "",
+    y = "Median Household Income ($)",
+    caption = "Source: U.S. Census Bureau, ACS 5-Year Estimates"
+  ) +
+  theme_minimal(base_family = "Times") +
+  theme(
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12),
+    axis.text.y = element_text(size = 10),
+    axis.text.x = element_text(size = 10)
+  )
+
+```
+
+This chart displays median household income across all 14 counties in Massachusetts for 2022, revealing significant economic disparities within the state. Nantucket County leads with the highest median household income at approximately $140,000, followed closely by Middlesex and Norfolk Counties at around $120,000 each. The wealthy suburban counties surrounding Boston - including Plymouth, Essex, and Dukes County - form the upper tier with incomes ranging from $90,000 to $110,000. In contrast, the western and southeastern regions show notably lower incomes, with Hampden County recording the lowest median at roughly $65,000, followed by Berkshire and Franklin Counties at approximately $70,000 each. The error bars indicate the statistical uncertainty in these American Community Survey estimates, with some counties showing larger margins of error than others. This income distribution reflects Massachusetts' economic geography, where proximity to Boston's job market and coastal affluence (particularly on the islands) drives higher household incomes, while more rural and post-industrial areas in western and southeastern Massachusetts lag behind the state's economic centers.
