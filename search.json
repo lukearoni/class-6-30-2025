@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Massachusetts Income",
+    "section": "",
+    "text": "This chart displays median household income across all 14 counties in Massachusetts for 2022, revealing significant economic disparities within the state. Nantucket County leads with the highest median household income at approximately $140,000, followed closely by Middlesex and Norfolk Counties at around $120,000 each. The wealthy suburban counties surrounding Boston - including Plymouth, Essex, and Dukes County - form the upper tier with incomes ranging from $90,000 to $110,000. In contrast, the western and southeastern regions show notably lower incomes, with Hampden County recording the lowest median at roughly $65,000, followed by Berkshire and Franklin Counties at approximately $70,000 each. The error bars indicate the statistical uncertainty in these American Community Survey estimates, with some counties showing larger margins of error than others. This income distribution reflects Massachusetts’ economic geography, where proximity to Boston’s job market and coastal affluence (particularly on the islands) drives higher household incomes, while more rural and post-industrial areas in western and southeastern Massachusetts lag behind the state’s economic centers."
+  }
+]
